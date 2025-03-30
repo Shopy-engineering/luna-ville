@@ -1,69 +1,70 @@
-# Welcome to your Lovable project
+
+# Luna Ville - Custom Rugs
+
+Luna Ville is a premium custom rug company that specializes in handcrafted, bespoke rugs for homes and businesses.
 
 ## Project info
 
 **URL**: https://lovable.dev/projects/6497d380-9990-4136-b799-81eb1946f21a
 
-## How can I edit this code?
+## Features
 
-There are several ways of editing your application.
+- Browse through our collection of custom rugs
+- Learn about our design process
+- Request custom designs
+- Contact our team for inquiries
 
-**Use Lovable**
+## Local Development Setup
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/6497d380-9990-4136-b799-81eb1946f21a) and start prompting.
+To run the Luna Ville website locally, follow these steps:
 
-Changes made via Lovable will be committed automatically to this repo.
+### Prerequisites
 
-**Use your preferred IDE**
+- Node.js (v16 or higher)
+- npm (v7 or higher)
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+### Installation
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Step 1: Clone the repository
+git clone <repository-url>
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Step 2: Navigate to the project directory
+cd luna-ville
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Step 3: Install dependencies
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Step 4: Start the development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Available Scripts
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- `npm run dev` - Start the development server
+- `npm run build` - Build the production-ready website
+- `npm run preview` - Preview the production build locally
+- `npm run lint` - Run ESLint to check for code quality issues
 
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with .
+## Technologies Used
 
 - Vite
 - TypeScript
 - React
 - shadcn-ui
 - Tailwind CSS
+- Lucide Icons
 
-## How can I deploy this project?
+## Deployment
 
-Simply open [Lovable](https://lovable.dev/projects/6497d380-9990-4136-b799-81eb1946f21a) and click on Share -> Publish.
+This project is set up for automatic deployment to GitHub Pages through a workflow.
 
-## I want to use a custom domain - is that possible?
+To manually deploy:
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+1. Run `npm run build`
+2. The output will be in the `dist` folder
+3. Commit and push changes to the main branch to trigger the workflow
+
+## License
+
+All rights reserved © Luna Ville
