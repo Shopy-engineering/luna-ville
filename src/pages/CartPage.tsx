@@ -1,181 +1,118 @@
-
 import { useCart } from "@/context/CartContext";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { Trash2, ShoppingCart, ArrowRight, Minus, Plus } from "lucide-react";
 import { formatCurrency } from "@/lib/formatters";
-import { Separator } from "@/components/ui/separator";
+import { Product } from "@/types/cart";
+import { X } from "lucide-react";
+import { Link } from "react-router-dom";
 
 /**
- * Helper function to format currency
- * (This should be moved to a utils/formatters.ts file)
- */
-const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(amount);
-};
-
-/**
- * Shopping cart page component
+ * Cart page component displaying cart items and total
  */
 const CartPage = () => {
-  const {
-    items,
-    removeItem,
-    updateQuantity,
-    clearCart,
-    getSubtotal,
-    getTax,
-    getTotal,
-  } = useCart();
+  const { items, removeItem, updateQuantity, clearCart, getTotal } = useCart();
 
+  // Check if the cart is empty
   const isEmpty = items.length === 0;
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <h1 className="text-3xl md:text-4xl font-display font-medium mb-8">Shopping Cart</h1>
+    <div className="container mx-auto py-12">
+      <h1 className="text-3xl md:text-4xl font-display font-medium mb-8">Your Cart</h1>
 
       {isEmpty ? (
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <ShoppingCart className="h-16 w-16 text-luna-ville-300 mb-4" />
-          <h2 className="text-2xl font-medium mb-2">Your cart is empty</h2>
-          <p className="text-muted-foreground mb-6">
-            Looks like you haven't added any items to your cart yet.
-          </p>
-          <Button asChild className="bg-luna-ville-600 hover:bg-luna-ville-700">
-            <Link to="/collections">Browse Collections</Link>
-          </Button>
+        <div className="text-center">
+          <p className="text-gray-600 mb-4">Your cart is currently empty.</p>
+          <Link to="/collections" className="text-luna-ville-600 hover:underline">
+            Continue Shopping
+          </Link>
         </div>
       ) : (
-        <div className="grid gap-8 md:grid-cols-3">
-          {/* Cart Items (2/3 width on desktop) */}
-          <div className="md:col-span-2 space-y-6">
-            {/* Header */}
-            <div className="hidden md:grid md:grid-cols-5 text-sm font-medium text-muted-foreground">
-              <div className="col-span-2">Product</div>
-              <div className="text-center">Price</div>
-              <div className="text-center">Quantity</div>
-              <div className="text-right">Total</div>
-            </div>
-
-            {/* Items */}
-            <Separator />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Cart Items */}
+          <div className="md:col-span-2">
             {items.map((item) => (
-              <div key={item.product.id}>
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-4 py-4">
-                  {/* Product */}
-                  <div className="col-span-2 flex gap-4">
-                    <div className="h-24 w-24 rounded-md overflow-hidden">
-                      <img 
-                        src={item.product.image} 
-                        alt={item.product.name} 
-                        className="h-full w-full object-cover"
-                      />
-                    </div>
-                    <div>
-                      <h3 className="font-medium">{item.product.name}</h3>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        {item.product.size} - {item.product.material}
-                      </p>
-                      <button
-                        onClick={() => removeItem(item.product.id)}
-                        className="flex items-center text-sm text-red-500 hover:text-red-700"
-                      >
-                        <Trash2 className="h-4 w-4 mr-1" /> Remove
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Price */}
-                  <div className="md:text-center">
-                    <span className="md:hidden text-sm text-muted-foreground">Price: </span>
-                    {formatCurrency(item.product.price)}
-                  </div>
-
-                  {/* Quantity */}
-                  <div className="flex items-center md:justify-center">
-                    <div className="flex items-center rounded-md border">
-                      <button
-                        type="button"
-                        className="p-1 hover:bg-muted"
-                        onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
-                        disabled={item.quantity <= 1}
-                      >
-                        <Minus className="h-4 w-4" />
-                      </button>
-                      <span className="px-4 py-1 text-center">
-                        {item.quantity}
-                      </span>
-                      <button
-                        type="button"
-                        className="p-1 hover:bg-muted"
-                        onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                      >
-                        <Plus className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Total */}
-                  <div className="md:text-right font-medium">
-                    <span className="md:hidden text-sm text-muted-foreground">Total: </span>
-                    {formatCurrency(item.product.price * item.quantity)}
-                  </div>
-                </div>
-                <Separator />
-              </div>
+              <CartItem key={item.product.id} item={item} removeItem={removeItem} updateQuantity={updateQuantity} />
             ))}
-
-            {/* Actions */}
-            <div className="flex justify-between items-center pt-4">
-              <Button variant="outline" onClick={clearCart} className="text-sm">
-                <Trash2 className="h-4 w-4 mr-2" /> Clear Cart
-              </Button>
-              <Button asChild variant="outline" className="text-sm">
-                <Link to="/collections">
-                  Continue Shopping
-                </Link>
-              </Button>
-            </div>
           </div>
 
-          {/* Summary (1/3 width on desktop) */}
-          <div className="bg-gray-50 rounded-lg p-6 h-fit">
-            <h2 className="text-xl font-medium mb-4">Order Summary</h2>
-            
-            <div className="space-y-3 mb-6">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Subtotal</span>
-                <span>{formatCurrency(getSubtotal())}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Tax</span>
-                <span>{formatCurrency(getTax())}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Shipping</span>
-                <span>Free</span>
-              </div>
-              <Separator />
-              <div className="flex justify-between font-medium">
-                <span>Total</span>
-                <span>{formatCurrency(getTotal())}</span>
-              </div>
+          {/* Cart Summary */}
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-medium mb-4">Cart Summary</h2>
+            <div className="flex justify-between py-2 border-b">
+              <span>Subtotal</span>
+              <span>{formatCurrency(getTotal())}</span>
             </div>
-
-            <Button 
-              asChild 
-              className="w-full bg-luna-ville-600 hover:bg-luna-ville-700"
-            >
-              <Link to="/checkout">
-                Proceed to Checkout <ArrowRight className="ml-2 h-4 w-4" />
+            <div className="flex justify-between py-2 border-b">
+              <span>Shipping</span>
+              <span>Free</span>
+            </div>
+            <div className="flex justify-between py-2 border-b">
+              <span>Tax</span>
+              <span>{formatCurrency(0)}</span>
+            </div>
+            <div className="flex justify-between py-2 font-medium text-lg">
+              <span>Total</span>
+              <span>{formatCurrency(getTotal())}</span>
+            </div>
+            <div className="mt-6 flex flex-col gap-3">
+              <Link to="/checkout" className="block bg-luna-ville-600 text-white text-center py-3 rounded-md hover:bg-luna-ville-700 transition-colors">
+                Proceed to Checkout
               </Link>
-            </Button>
+              <button onClick={clearCart} className="text-red-600 hover:underline text-sm">
+                Clear Cart
+              </button>
+            </div>
           </div>
         </div>
       )}
+    </div>
+  );
+};
+
+interface CartItemProps {
+  item: { product: Product; quantity: number };
+  removeItem: (productId: number) => void;
+  updateQuantity: (productId: number, quantity: number) => void;
+}
+
+const CartItem: React.FC<CartItemProps> = ({ item, removeItem, updateQuantity }) => {
+  const { product, quantity } = item;
+
+  const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newQuantity = parseInt(e.target.value);
+    if (!isNaN(newQuantity)) {
+      updateQuantity(product.id, newQuantity);
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-between py-4 border-b">
+      {/* Product Image */}
+      <div className="w-24 h-24 mr-4">
+        <img src={product.image} alt={product.name} className="w-full h-full object-cover rounded-md" />
+      </div>
+
+      {/* Product Details */}
+      <div className="flex-grow">
+        <h3 className="font-medium">{product.name}</h3>
+        <p className="text-gray-600 text-sm">{formatCurrency(product.price)}</p>
+        <div className="flex items-center mt-2">
+          <label htmlFor={`quantity-${product.id}`} className="mr-2 text-sm">
+            Quantity:
+          </label>
+          <input
+            type="number"
+            id={`quantity-${product.id}`}
+            min="1"
+            value={quantity}
+            onChange={handleQuantityChange}
+            className="w-20 px-2 py-1 border rounded-md text-center text-sm"
+          />
+        </div>
+      </div>
+
+      {/* Remove Button */}
+      <button onClick={() => removeItem(product.id)} className="text-gray-500 hover:text-red-600">
+        <X className="h-5 w-5" />
+      </button>
     </div>
   );
 };

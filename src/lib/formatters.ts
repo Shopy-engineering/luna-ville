@@ -38,3 +38,27 @@ export const formatDateTime = (dateStr: string): string => {
     minute: '2-digit',
   });
 };
+
+/**
+ * Calculate rug price based on dimensions
+ * @param length - Length of rug in feet
+ * @param width - Width of rug in feet
+ * @param basePrice - Base price per square foot
+ * @returns Calculated price
+ */
+export const calculateRugPrice = (length: number, width: number, basePrice: number = 12): number => {
+  // Calculate area in square feet
+  const area = length * width;
+  
+  // Apply tiered pricing: larger rugs have slightly lower per-sq-ft costs
+  let pricePerSqFt = basePrice;
+  if (area > 80) {
+    pricePerSqFt = basePrice * 0.85; // 15% discount for very large rugs
+  } else if (area > 50) {
+    pricePerSqFt = basePrice * 0.9; // 10% discount for large rugs
+  }
+  
+  // Calculate total price
+  return Math.round(area * pricePerSqFt);
+};
+

@@ -1,7 +1,6 @@
-
+import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ChevronRight, Star } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { CustomButton } from "@/components/ui/custom-button";
 
 const HomePage = () => {
@@ -20,12 +19,12 @@ const HomePage = () => {
                 Custom designed, ethically sourced, and locally made rugs that bring warmth and character to any room.
               </p>
               <div className="flex flex-wrap gap-4">
-                <CustomButton size="lg" as={Link} to="/collections">
-                  Explore Collection
-                </CustomButton>
-                <CustomButton size="lg" variant="outline" as={Link} to="/custom-order">
-                  Custom Order
-                </CustomButton>
+                <Button size="lg" asChild>
+                  <Link to="/collections">Explore Collection</Link>
+                </Button>
+                <Button size="lg" variant="outline" asChild>
+                  <Link to="/custom-order">Custom Order</Link>
+                </Button>
               </div>
             </div>
           </div>

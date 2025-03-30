@@ -17,6 +17,7 @@ import NotFound from "./pages/NotFound";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import OrderConfirmationPage from "./pages/OrderConfirmationPage";
+import RugCustomizerPage from "./pages/RugCustomizerPage";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const App = () => (
               <Route path="collections" element={<CollectionsPage />} />
               <Route path="about" element={<AboutPage />} />
               <Route path="custom-order" element={<CustomOrderPage />} />
+              <Route path="rug-customizer" element={<RugCustomizerPage />} />
               <Route path="contact" element={<ContactPage />} />
               <Route path="cart" element={<CartPage />} />
               <Route path="checkout" element={<CheckoutPage />} />

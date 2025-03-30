@@ -1,485 +1,204 @@
-
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useCart } from "@/context/CartContext";
-import { orderService } from "@/services/orderService";
-import { ShippingAddress, Order as OrderType, OrderStatus } from "@/types/cart";
-import { useToast } from "@/hooks/use-toast";
-import { Separator } from "@/components/ui/separator";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CreditCard, Check, ArrowLeft } from "lucide-react";
 import { formatCurrency } from "@/lib/formatters";
+import { Order, ShippingAddress } from "@/types/cart";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { toast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
 
-/**
- * Helper function to format currency
- * (This should be moved to a utils/formatters.ts file)
- */
-const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(amount);
-};
-
-/**
- * Validation schema for checkout form
- */
-const checkoutFormSchema = z.object({
-  firstName: z.string().min(2, "First name is required"),
-  lastName: z.string().min(2, "Last name is required"),
-  email: z.string().email("Invalid email address"),
-  phone: z.string().min(10, "Valid phone number is required"),
-  address1: z.string().min(5, "Address is required"),
+// Zod schema for form validation
+const formSchema = z.object({
+  firstName: z.string().min(2, {
+    message: "First name must be at least 2 characters.",
+  }),
+  lastName: z.string().min(2, {
+    message: "Last name must be at least 2 characters.",
+  }),
+  address1: z.string().min(5, {
+    message: "Address must be at least 5 characters.",
+  }),
   address2: z.string().optional(),
-  city: z.string().min(2, "City is required"),
-  state: z.string().min(2, "State is required"),
-  zipCode: z.string().min(5, "ZIP code is required"),
-  country: z.string().min(2, "Country is required"),
-  paymentMethod: z.enum(["credit_card", "paypal"]),
-  cardNumber: z.string().optional(),
-  cardExpiry: z.string().optional(),
-  cardCvc: z.string().optional(),
+  city: z.string().min(2, {
+    message: "City must be at least 2 characters.",
+  }),
+  state: z.string().min(2, {
+    message: "State must be at least 2 characters.",
+  }),
+  zipCode: z.string().regex(/^\d{5}(?:-\d{4})?$/, {
+    message: "Invalid ZIP code.",
+  }),
+  country: z.string().min(2, {
+    message: "Country must be at least 2 characters.",
+  }),
+  phone: z.string().regex(/^\d{10}$/, {
+    message: "Phone number must be 10 digits.",
+  }),
+  paymentMethod: z.string().min(2, {
+    message: "Payment method must be at least 2 characters.",
+  }),
 });
 
-/**
- * Type for checkout form values
- */
-type CheckoutFormValues = z.infer<typeof checkoutFormSchema>;
-
-/**
- * Checkout page component
- */
 const CheckoutPage = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const { items, getSubtotal, getTax, getTotal, clearCart } = useCart();
-
+  const { items, clearCart, getSubtotal, getTax, getTotal } = useCart();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Redirect if cart is empty
-  if (items.length === 0) {
-    navigate("/cart");
-    return null;
-  }
-
-  /**
-   * Initialize form with default values
-   */
-  const form = useForm<CheckoutFormValues>({
-    resolver: zodResolver(checkoutFormSchema),
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       firstName: "",
       lastName: "",
-      email: "",
-      phone: "",
       address1: "",
       address2: "",
       city: "",
       state: "",
       zipCode: "",
-      country: "United States",
-      paymentMethod: "credit_card",
-      cardNumber: "",
-      cardExpiry: "",
-      cardCvc: "",
+      country: "",
+      phone: "",
+      paymentMethod: "",
     },
   });
 
-  /**
-   * Handle form submission
-   */
-  const onSubmit = async (data: CheckoutFormValues) => {
-    try {
-      setIsSubmitting(true);
+  const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = async (values) => {
+    setIsSubmitting(true);
 
-      // Extract shipping address from form data
-      const shippingAddress: ShippingAddress = {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        address1: data.address1,
-        address2: data.address2,
-        city: data.city,
-        state: data.state,
-        zipCode: data.zipCode,
-        country: data.country,
-        phone: data.phone,
-      };
+    // Create order object
+    const order: Order = {
+      items: items,
+      subtotal: getSubtotal(),
+      tax: getTax(),
+      total: getTotal(),
+      shippingAddress: values,
+      paymentMethod: values.paymentMethod,
+      status: "pending",
+    };
 
-      // Create order object
-      const order: OrderType = {
-        items: items,
-        subtotal: getSubtotal(),
-        tax: getTax(),
-        total: getTotal(),
-        shippingAddress,
-        paymentMethod: data.paymentMethod,
-        status: "pending" as OrderStatus,
-        userId: "user-123", // This should come from authentication when integrated
-      };
-
-      // Submit order to Supabase via our service
-      const createdOrder = await orderService.createOrder(order);
-      
-      // Clear the cart and navigate to confirmation page
+    // Simulate order submission
+    setTimeout(() => {
+      console.log("Order submitted:", order);
       clearCart();
-      navigate("/order-confirmation", { 
-        state: { order: createdOrder } 
-      });
-      
       toast({
-        title: "Order placed successfully!",
-        description: "Thank you for your purchase.",
-        variant: "default",
+        title: "Order submitted",
+        description: "Thank you for your order!",
       });
-      
-    } catch (error) {
-      console.error("Error placing order:", error);
-      toast({
-        title: "Error placing order",
-        description: "There was a problem processing your order. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
       setIsSubmitting(false);
-    }
+      navigate("/order-confirmation");
+    }, 1500);
   };
 
-  /**
-   * Watch paymentMethod to conditionally show card fields
-   */
-  const paymentMethod = form.watch("paymentMethod");
-
   return (
-    <div className="container mx-auto px-4 py-12">
-      <h1 className="text-3xl md:text-4xl font-display font-medium mb-8">Checkout</h1>
-
-      <div className="grid gap-8 md:grid-cols-3">
-        {/* Checkout Form (2/3 width on desktop) */}
-        <div className="md:col-span-2">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              {/* Contact Information */}
+    <div className="container mx-auto py-12">
+      <Card className="max-w-2xl mx-auto">
+        <CardHeader>
+          <CardTitle className="text-2xl">Checkout</CardTitle>
+          <CardDescription>Enter your shipping information below.</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <h2 className="text-xl font-medium mb-4">Contact Information</h2>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <FormField
-                    control={form.control}
-                    name="firstName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>First Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="John" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="lastName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Last Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Doe" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input type="email" placeholder="you@example.com" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone</FormLabel>
-                        <FormControl>
-                          <Input placeholder="(123) 456-7890" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                <Label htmlFor="firstName">First Name</Label>
+                <Input id="firstName" placeholder="John" {...form.register("firstName")} />
+                {form.formState.errors.firstName && (
+                  <p className="text-red-500 text-sm">{form.formState.errors.firstName.message}</p>
+                )}
               </div>
-
-              {/* Shipping Address */}
               <div>
-                <h2 className="text-xl font-medium mb-4">Shipping Address</h2>
-                <div className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="address1"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Address Line 1</FormLabel>
-                        <FormControl>
-                          <Input placeholder="123 Main St" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="address2"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Address Line 2 (Optional)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Apt 4B" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <FormField
-                      control={form.control}
-                      name="city"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>City</FormLabel>
-                          <FormControl>
-                            <Input placeholder="New York" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="state"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>State/Province</FormLabel>
-                          <FormControl>
-                            <Input placeholder="NY" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="zipCode"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>ZIP/Postal Code</FormLabel>
-                          <FormControl>
-                            <Input placeholder="10001" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="country"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Country</FormLabel>
-                          <FormControl>
-                            <Input placeholder="United States" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </div>
+                <Label htmlFor="lastName">Last Name</Label>
+                <Input id="lastName" placeholder="Doe" {...form.register("lastName")} />
+                {form.formState.errors.lastName && (
+                  <p className="text-red-500 text-sm">{form.formState.errors.lastName.message}</p>
+                )}
               </div>
+            </div>
 
-              {/* Payment Information */}
+            <div>
+              <Label htmlFor="address1">Address</Label>
+              <Input id="address1" placeholder="123 Main St" {...form.register("address1")} />
+              {form.formState.errors.address1 && (
+                <p className="text-red-500 text-sm">{form.formState.errors.address1.message}</p>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="address2">Address 2 (Optional)</Label>
+              <Input id="address2" placeholder="Apt 4B" {...form.register("address2")} />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <h2 className="text-xl font-medium mb-4">Payment Information</h2>
-                <div className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="paymentMethod"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Payment Method</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a payment method" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="credit_card">Credit Card</SelectItem>
-                            <SelectItem value="paypal">PayPal</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Credit Card Fields (conditionally shown) */}
-                  {paymentMethod === "credit_card" && (
-                    <div className="grid gap-4">
-                      <FormField
-                        control={form.control}
-                        name="cardNumber"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Card Number</FormLabel>
-                            <FormControl>
-                              <Input placeholder="4111 1111 1111 1111" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <div className="grid grid-cols-2 gap-4">
-                        <FormField
-                          control={form.control}
-                          name="cardExpiry"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Expiration Date</FormLabel>
-                              <FormControl>
-                                <Input placeholder="MM/YY" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="cardCvc"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>CVC</FormLabel>
-                              <FormControl>
-                                <Input placeholder="123" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
+                <Label htmlFor="city">City</Label>
+                <Input id="city" placeholder="New York" {...form.register("city")} />
+                {form.formState.errors.city && (
+                  <p className="text-red-500 text-sm">{form.formState.errors.city.message}</p>
+                )}
               </div>
-
-              {/* Form Actions */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-between pt-4">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={() => navigate("/cart")}
-                >
-                  <ArrowLeft className="mr-2 h-4 w-4" /> Back to Cart
-                </Button>
-                <Button 
-                  type="submit" 
-                  className="bg-luna-ville-600 hover:bg-luna-ville-700"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    <>Processing...</>
-                  ) : (
-                    <>
-                      <CreditCard className="mr-2 h-4 w-4" /> Place Order
-                    </>
-                  )}
-                </Button>
+              <div>
+                <Label htmlFor="state">State</Label>
+                <Input id="state" placeholder="NY" {...form.register("state")} />
+                {form.formState.errors.state && (
+                  <p className="text-red-500 text-sm">{form.formState.errors.state.message}</p>
+                )}
               </div>
-            </form>
-          </Form>
-        </div>
-
-        {/* Order Summary (1/3 width on desktop) */}
-        <div className="bg-gray-50 rounded-lg p-6 h-fit">
-          <h2 className="text-xl font-medium mb-4">Order Summary</h2>
-          
-          {/* Items */}
-          <div className="space-y-4 mb-4">
-            {items.map((item) => (
-              <div key={item.product.id} className="flex justify-between">
-                <div className="flex items-start">
-                  <div className="h-12 w-12 rounded-md overflow-hidden mr-3">
-                    <img 
-                      src={item.product.image} 
-                      alt={item.product.name} 
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                  <div>
-                    <p className="font-medium">{item.product.name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {item.quantity} × {formatCurrency(item.product.price)}
-                    </p>
-                  </div>
-                </div>
-                <p>{formatCurrency(item.product.price * item.quantity)}</p>
+              <div>
+                <Label htmlFor="zipCode">ZIP Code</Label>
+                <Input id="zipCode" placeholder="10001" {...form.register("zipCode")} />
+                {form.formState.errors.zipCode && (
+                  <p className="text-red-500 text-sm">{form.formState.errors.zipCode.message}</p>
+                )}
               </div>
-            ))}
-          </div>
-          
-          <Separator className="my-4" />
-          
-          {/* Totals */}
-          <div className="space-y-3 mb-6">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Subtotal</span>
-              <span>{formatCurrency(getSubtotal())}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Tax</span>
-              <span>{formatCurrency(getTax())}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Shipping</span>
-              <span>Free</span>
-            </div>
-            <Separator />
-            <div className="flex justify-between font-medium">
-              <span>Total</span>
-              <span>{formatCurrency(getTotal())}</span>
-            </div>
-          </div>
 
-          {/* Secure Checkout Notice */}
-          <div className="bg-luna-ville-50 border border-luna-ville-200 rounded-md p-3 text-sm flex items-center">
-            <Check className="h-4 w-4 text-luna-ville-600 mr-2 flex-shrink-0" />
-            <span>Your payment information is processed securely.</span>
-          </div>
-        </div>
-      </div>
+            <div>
+              <Label htmlFor="country">Country</Label>
+              <Input id="country" placeholder="USA" {...form.register("country")} />
+              {form.formState.errors.country && (
+                <p className="text-red-500 text-sm">{form.formState.errors.country.message}</p>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input id="phone" placeholder="2125551234" {...form.register("phone")} />
+              {form.formState.errors.phone && (
+                <p className="text-red-500 text-sm">{form.formState.errors.phone.message}</p>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="paymentMethod">Payment Method</Label>
+              <Input id="paymentMethod" placeholder="Credit Card" {...form.register("paymentMethod")} />
+              {form.formState.errors.paymentMethod && (
+                <p className="text-red-500 text-sm">{form.formState.errors.paymentMethod.message}</p>
+              )}
+            </div>
+
+            <CardFooter className="flex flex-col space-y-4">
+              <div>
+                <div className="text-lg font-medium">Subtotal: {formatCurrency(getSubtotal())}</div>
+                <div className="text-lg font-medium">Tax: {formatCurrency(getTax())}</div>
+                <div className="text-2xl font-bold">Total: {formatCurrency(getTotal())}</div>
+              </div>
+              <Button disabled={isSubmitting} type="submit" className="w-full">
+                {isSubmitting ? "Submitting..." : "Submit Order"}
+              </Button>
+            </CardFooter>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 };
