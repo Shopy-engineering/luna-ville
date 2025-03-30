@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -52,6 +51,19 @@ export default {
 				card: {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
+				},
+				'luna-ville': {
+					'50': '#FDFFFA', 
+					'100': '#F8FCF0', 
+					'200': '#EEFADC', 
+					'300': '#E0F5C4', 
+					'400': '#C6F09E', 
+					'500': '#a3e977', 
+					'600': '#8AD160', 
+					'700': '#66AD42', 
+					'800': '#498C2B', 
+					'900': '#2F6918', 
+					'950': '#18420A'
 				},
 				lunaville: {
 					50: '#f9f5f7',
