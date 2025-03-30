@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useCart } from "@/context/CartContext";
 import { formatCurrency } from "@/lib/formatters";
@@ -51,12 +52,15 @@ const formSchema = z.object({
   }),
 });
 
+// Type for form values to ensure they match ShippingAddress
+type FormValues = z.infer<typeof formSchema>;
+
 const CheckoutPage = () => {
   const navigate = useNavigate();
   const { items, clearCart, getSubtotal, getTax, getTotal } = useCart();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       firstName: "",
@@ -72,8 +76,21 @@ const CheckoutPage = () => {
     },
   });
 
-  const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = async (values) => {
+  const onSubmit: SubmitHandler<FormValues> = async (values) => {
     setIsSubmitting(true);
+
+    // Create shipping address from form values
+    const shippingAddress: ShippingAddress = {
+      firstName: values.firstName,
+      lastName: values.lastName,
+      address1: values.address1,
+      address2: values.address2 || "",
+      city: values.city,
+      state: values.state,
+      zipCode: values.zipCode,
+      country: values.country,
+      phone: values.phone
+    };
 
     // Create order object
     const order: Order = {
@@ -81,7 +98,7 @@ const CheckoutPage = () => {
       subtotal: getSubtotal(),
       tax: getTax(),
       total: getTotal(),
-      shippingAddress: values,
+      shippingAddress: shippingAddress,
       paymentMethod: values.paymentMethod,
       status: "pending",
     };

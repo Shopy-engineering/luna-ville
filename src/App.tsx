@@ -21,13 +21,16 @@ import RugCustomizerPage from "./pages/RugCustomizerPage";
 
 const queryClient = new QueryClient();
 
+// Get the base URL from the import.meta.env or default to '/'
+const baseUrl = import.meta.env.BASE_URL || '/';
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <CartProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
+        <BrowserRouter basename={baseUrl}>
           <Routes>
             <Route path="/" element={<Layout />}>
               <Route index element={<HomePage />} />
