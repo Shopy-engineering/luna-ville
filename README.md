@@ -1,12 +1,3 @@
-
-# Luna Ville - Custom Rugs
-
-Luna Ville is a premium custom rug company that specializes in handcrafted, bespoke rugs for homes and businesses.
-
-## Project info
-
-**URL**: https://lovable.dev/projects/6497d380-9990-4136-b799-81eb1946f21a
-
 ## Features
 
 - Browse through our collection of custom rugs
@@ -14,20 +5,12 @@ Luna Ville is a premium custom rug company that specializes in handcrafted, besp
 - Request custom designs
 - Contact our team for inquiries
 
-## Local Development Setup
-
-To run the Luna Ville website locally, follow these steps:
-
-### Prerequisites
-
-- Node.js (v16 or higher)
-- npm (v7 or higher)
 
 ### Installation
 
 ```sh
 # Step 1: Clone the repository
-git clone <repository-url>
+git clone https://github.com/Shopy-engineering/luna-ville.git
 
 # Step 2: Navigate to the project directory
 cd luna-ville
