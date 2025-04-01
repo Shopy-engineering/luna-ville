@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Star, ChevronDown, SlidersHorizontal, X, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -38,7 +37,7 @@ interface FilterableProductGridProps {
 /**
  * FilterableProductGrid component that displays products with filtering options
  */
-const FilterableProductGrid = ({ products }: FilterableProductGridProps) => {
+const FilterableProductGrid = ({ products }: { products: Product[] }) => {
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState([0, 1000]);
   const [sortOption, setSortOption] = useState("featured");
@@ -340,8 +339,14 @@ const FilterableProductGrid = ({ products }: FilterableProductGridProps) => {
 
         {/* Products */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {products.map(product => (
-            <ProductCard key={product.id} product={product} />
+          {products.map((product) => (
+            <div key={product.id} className="group">
+              <div className="relative rounded-lg overflow-hidden mb-4 aspect-square">
+                {product.image} {/* Render the AdvancedImage component */}
+              </div>
+              <h3 className="text-base font-medium">{product.name}</h3>
+              <p className="text-lunaville-700 font-medium">${product.price}</p>
+            </div>
           ))}
         </div>
       </div>
