@@ -1,8 +1,7 @@
 
 import { Product } from "@/types/cart";
 import FilterableProductGrid from "@/components/FilterableProdcutGrid";
-import { AdvancedImage } from "@cloudinary/react";
-import cloudinary from "@/utils/cloudinary";
+
 
 const CollectionsPage = () => {
   return (

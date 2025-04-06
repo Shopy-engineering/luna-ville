@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { Star, ChevronDown, SlidersHorizontal, X, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -24,7 +23,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Product } from "@/types/cart";
-import ProductCard from "./ProductCard";
+import { AdvancedImage } from "@cloudinary/react";
+import cloudinary from "@/utils/cloudinary";
 
 // Mock Data for filters
 const categories = ["Contemporary", "Traditional", "Minimalist", "Bohemian", "Geometric"];
@@ -396,7 +396,16 @@ const FilterableProductGrid = ({ products }: FilterableProductGridProps) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProducts.length > 0 ? (
             filteredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <div key={product.id} className="group">
+                <div className="relative rounded-lg overflow-hidden mb-4 aspect-square">
+                  <AdvancedImage
+                    cldImg={cloudinary.image(product.image)} // Use Cloudinary public ID
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <h3 className="text-base font-medium">{product.name}</h3>
+                <p className="text-luna-ville-600 font-medium">${product.price}</p>
+              </div>
             ))
           ) : (
             <div className="col-span-full text-center py-12">
