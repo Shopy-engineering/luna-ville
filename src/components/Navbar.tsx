@@ -21,6 +21,7 @@ const Navbar = () => {
     { name: "About", path: "/about" },
     { name: "Custom Order", path: "/custom-order" },
     { name: "Contact", path: "/contact" },
+    { name: "Rug Customizer", path: "/rug-customizer" },
   ];
 
   return (

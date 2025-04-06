@@ -31,7 +31,7 @@ const products: Product[] = [
     price: 299,
     rating: 5,
     reviews: 42,
-    image: "products/lunar-eclipse", // Cloudinary public ID
+    image: "GOfR6x4WEAAN5NX_b72k0v", // Cloudinary public ID
     category: ["Contemporary", "Minimalist"],
     material: "Wool",
     size: "Large (8'x10')",
@@ -43,7 +43,7 @@ const products: Product[] = [
     price: 349,
     rating: 4,
     reviews: 28,
-    image: "products/sunset-gradient", // Cloudinary public ID
+    image: "GOfR6x4WEAAN5NX_b72k0v", // Cloudinary public ID
     category: ["Contemporary", "Bohemian"],
     material: "Cotton",
     size: "Medium (5'x7')",
@@ -55,7 +55,7 @@ const products: Product[] = [
     price: 399,
     rating: 5,
     reviews: 36,
-    image: "products/midnight-blue", // Cloudinary public ID
+    image: "GOfR6x4WEAAN5NX_b72k0v", // Cloudinary public ID
     category: ["Traditional", "Geometric"],
     material: "Wool",
     size: "Large (8'x10')",
@@ -67,7 +67,7 @@ const products: Product[] = [
     price: 279,
     rating: 4,
     reviews: 19,
-    image: "products/desert-sand", // Cloudinary public ID
+    image: "GOfR6x4WEAAN5NX_b72k0v", // Cloudinary public ID
     category: ["Minimalist", "Bohemian"],
     material: "Jute",
     size: "Medium (5'x7')",
@@ -79,7 +79,7 @@ const products: Product[] = [
     price: 329,
     rating: 5,
     reviews: 31,
-    image: "products/forest-path", // Cloudinary public ID
+    image: "GOfR6x4WEAAN5NX_b72k0v", // Cloudinary public ID
     category: ["Traditional", "Contemporary"],
     material: "Wool",
     size: "Medium (5'x7')",
@@ -91,7 +91,7 @@ const products: Product[] = [
     price: 449,
     rating: 5,
     reviews: 24,
-    image: "products/ocean-waves", // Cloudinary public ID
+    image: "GOfR6x4WEAAN5NX_b72k0v", // Cloudinary public ID
     category: ["Contemporary", "Minimalist"],
     material: "Silk",
     size: "Large (8'x10')",
@@ -103,7 +103,7 @@ const products: Product[] = [
     price: 369,
     rating: 4,
     reviews: 18,
-    image: "products/urban-geometry", // Cloudinary public ID
+    image: "GOfR6x4WEAAN5NX_b72k0v", // Cloudinary public ID
     category: ["Geometric", "Contemporary"],
     material: "Synthetic",
     size: "Small (3'x5')",
@@ -115,7 +115,7 @@ const products: Product[] = [
     price: 319,
     rating: 4,
     reviews: 22,
-    image: "products/morning-mist", // Cloudinary public ID
+    image: "GOfR6x4WEAAN5NX_b72k0v", // Cloudinary public ID
     category: ["Minimalist", "Contemporary"],
     material: "Cotton",
     size: "Runner",
@@ -127,8 +127,8 @@ const products: Product[] = [
     price: 289,
     rating: 5,
     reviews: 27,
-    image: "products/autumn-leaves", // Cloudinary public ID
-    category: ["Traditional", "Bohemian"],
+    image: "GOfR6x4WEAAN5NX_b72k0v", // Cloudinary public ID
+    category: ["Traditional"],
     material: "Wool",
     size: "Round",
     inStock: true,
