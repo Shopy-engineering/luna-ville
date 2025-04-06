@@ -20,7 +20,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
 
   return (
-    <div className="group">
+    <div className="group relative">
       <div className="relative rounded-lg overflow-hidden mb-4 aspect-square">
         <img
           src={product.image}
@@ -28,7 +28,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
         <div className="absolute inset-0 bg-black bg-opacity-20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-          <AddToCartButton product={product} variant="icon" className="transform -translate-y-4 group-hover:translate-y-0 transition-all duration-300" />
+          <div className="transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+            <AddToCartButton product={product} variant="icon" className="bg-luna-ville-600 hover:bg-luna-ville-700" />
+          </div>
         </div>
       </div>
       <h3 className="text-base font-medium">{product.name}</h3>
@@ -51,6 +53,16 @@ const ProductCard = ({ product }: ProductCardProps) => {
         <span className="text-gray-500 text-xs ml-2">({product.reviews})</span>
       </div>
       <p className="text-luna-ville-700 font-medium">{formatCurrency(product.price)}</p>
+      
+      {/* Quick view button that appears on hover */}
+      <div className="absolute inset-x-0 bottom-0 opacity-0 group-hover:opacity-100 transition-opacity">
+        <button 
+          onClick={() => setIsQuickViewOpen(true)}
+          className="w-full py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-sm text-center transition-colors"
+        >
+          Quick View
+        </button>
+      </div>
       
       <ProductQuickView 
         product={product} 
