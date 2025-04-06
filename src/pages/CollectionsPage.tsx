@@ -2,7 +2,6 @@
 import { Product } from "@/types/cart";
 import FilterableProductGrid from "@/components/FilterableProdcutGrid";
 
-
 const CollectionsPage = () => {
   return (
     <div className="container mx-auto px-6 md:px-12 py-12">
@@ -21,7 +20,7 @@ const products: Product[] = [
     price: 299,
     rating: 5,
     reviews: 42,
-    image: "GOfR6x4WEAAN5NX_b72k0v", // Cloudinary public ID
+    image: "GbH3JMiWYAArhMV_lxcd6r", // Updated to a real Cloudinary public ID
     category: ["Contemporary", "Minimalist"],
     material: "Wool",
     size: "Large (8'x10')",
@@ -33,7 +32,7 @@ const products: Product[] = [
     price: 349,
     rating: 4,
     reviews: 28,
-    image: "GOfR6x4WEAAN5NX_b72k0v", // Cloudinary public ID
+    image: "GTQfK5OXwAAdbfP_u4hlto", // Updated to a real Cloudinary public ID
     category: ["Contemporary", "Bohemian"],
     material: "Cotton",
     size: "Medium (5'x7')",
@@ -45,7 +44,7 @@ const products: Product[] = [
     price: 399,
     rating: 5,
     reviews: 36,
-    image: "GOfR6x4WEAAN5NX_b72k0v", // Cloudinary public ID
+    image: "GbXM4ytWcAAGwXl_l99dvu", // Updated to a real Cloudinary public ID
     category: ["Traditional", "Geometric"],
     material: "Wool",
     size: "Large (8'x10')",
@@ -57,7 +56,7 @@ const products: Product[] = [
     price: 279,
     rating: 4,
     reviews: 19,
-    image: "GOfR6x4WEAAN5NX_b72k0v", // Cloudinary public ID
+    image: "GRqFxw9WIAAzYW__xpyql1", // Updated to a real Cloudinary public ID
     category: ["Minimalist", "Bohemian"],
     material: "Jute",
     size: "Medium (5'x7')",
@@ -69,7 +68,7 @@ const products: Product[] = [
     price: 329,
     rating: 5,
     reviews: 31,
-    image: "GOfR6x4WEAAN5NX_b72k0v", // Cloudinary public ID
+    image: "GbH3JMiWYAArhMV_lxcd6r", // Updated to a real Cloudinary public ID
     category: ["Traditional", "Contemporary"],
     material: "Wool",
     size: "Medium (5'x7')",
@@ -81,7 +80,7 @@ const products: Product[] = [
     price: 449,
     rating: 5,
     reviews: 24,
-    image: "GOfR6x4WEAAN5NX_b72k0v", // Cloudinary public ID
+    image: "GTQfK5OXwAAdbfP_u4hlto", // Updated to a real Cloudinary public ID
     category: ["Contemporary", "Minimalist"],
     material: "Silk",
     size: "Large (8'x10')",
@@ -93,7 +92,7 @@ const products: Product[] = [
     price: 369,
     rating: 4,
     reviews: 18,
-    image: "GOfR6x4WEAAN5NX_b72k0v", // Cloudinary public ID
+    image: "GbXM4ytWcAAGwXl_l99dvu", // Updated to a real Cloudinary public ID
     category: ["Geometric", "Contemporary"],
     material: "Synthetic",
     size: "Small (3'x5')",
@@ -105,7 +104,7 @@ const products: Product[] = [
     price: 319,
     rating: 4,
     reviews: 22,
-    image: "GOfR6x4WEAAN5NX_b72k0v", // Cloudinary public ID
+    image: "GRqFxw9WIAAzYW__xpyql1", // Updated to a real Cloudinary public ID
     category: ["Minimalist", "Contemporary"],
     material: "Cotton",
     size: "Runner",
@@ -117,7 +116,7 @@ const products: Product[] = [
     price: 289,
     rating: 5,
     reviews: 27,
-    image: "GOfR6x4WEAAN5NX_b72k0v", // Cloudinary public ID
+    image: "GbH3JMiWYAArhMV_lxcd6r", // Updated to a real Cloudinary public ID
     category: ["Traditional"],
     material: "Wool",
     size: "Round",

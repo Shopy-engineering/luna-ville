@@ -3,6 +3,8 @@ import { Star } from "lucide-react";
 import { Product } from "@/types/cart";
 import AddToCartButton from "./AddToCartButton";
 import { formatCurrency } from "@/lib/formatters";
+import { useState } from "react";
+import ProductQuickView from "./ProductQuickView";
 
 /**
  * Props for ProductCard component
@@ -15,6 +17,8 @@ interface ProductCardProps {
  * Product card component that displays a product with add to cart functionality
  */
 const ProductCard = ({ product }: ProductCardProps) => {
+  const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
+
   return (
     <div className="group">
       <div className="relative rounded-lg overflow-hidden mb-4 aspect-square">
@@ -47,6 +51,12 @@ const ProductCard = ({ product }: ProductCardProps) => {
         <span className="text-gray-500 text-xs ml-2">({product.reviews})</span>
       </div>
       <p className="text-luna-ville-700 font-medium">{formatCurrency(product.price)}</p>
+      
+      <ProductQuickView 
+        product={product} 
+        open={isQuickViewOpen} 
+        onOpenChange={setIsQuickViewOpen} 
+      />
     </div>
   );
 };

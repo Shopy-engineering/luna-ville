@@ -1,11 +1,24 @@
+
 import { AdvancedImage } from "@cloudinary/react";
 import cloudinary from "@/utils/cloudinary";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ChevronRight, Star } from "lucide-react";
 import { CustomButton } from "@/components/ui/custom-button";
+import { useState } from "react";
+import ProductQuickView from "@/components/ProductQuickView";
 
 const HomePage = () => {
+  const [quickViewProduct, setQuickViewProduct] = useState<number | null>(null);
+  
+  const handleQuickView = (productId: number) => {
+    setQuickViewProduct(productId);
+  };
+  
+  const handleCloseQuickView = () => {
+    setQuickViewProduct(null);
+  };
+
   return (
     <div>
       {/* Hero Section */}
@@ -79,7 +92,10 @@ const HomePage = () => {
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-black bg-opacity-20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <button className="bg-white text-gray-900 px-6 py-2 rounded-md font-medium text-sm transform -translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                    <button 
+                      className="bg-white text-gray-900 px-6 py-2 rounded-md font-medium text-sm transform -translate-y-4 group-hover:translate-y-0 transition-all duration-300"
+                      onClick={() => handleQuickView(product.id)}
+                    >
                       Quick View
                     </button>
                   </div>
@@ -98,6 +114,14 @@ const HomePage = () => {
                   <span className="text-gray-500 text-xs ml-2">({product.reviews})</span>
                 </div>
                 <p className="text-lunaville-700 font-medium">${product.price}</p>
+                
+                {quickViewProduct === product.id && (
+                  <ProductQuickView 
+                    product={product} 
+                    open={quickViewProduct === product.id} 
+                    onOpenChange={() => handleCloseQuickView()} 
+                  />
+                )}
               </div>
             ))}
           </div>
@@ -134,6 +158,10 @@ const bestSellers = [
     rating: 5,
     reviews: 42,
     image: "GbH3JMiWYAArhMV_lxcd6r", // Cloudinary public ID
+    category: ["Contemporary", "Minimalist"],
+    material: "Wool",
+    size: "Large (8'x10')",
+    inStock: true,
   },
   {
     id: 2,
@@ -142,6 +170,10 @@ const bestSellers = [
     rating: 4,
     reviews: 28,
     image: "GTQfK5OXwAAdbfP_u4hlto", // Cloudinary public ID
+    category: ["Contemporary", "Bohemian"],
+    material: "Cotton",
+    size: "Medium (5'x7')",
+    inStock: true,
   },
   {
     id: 3,
@@ -150,6 +182,10 @@ const bestSellers = [
     rating: 5,
     reviews: 36,
     image: "GbXM4ytWcAAGwXl_l99dvu", // Cloudinary public ID
+    category: ["Traditional", "Geometric"],
+    material: "Wool",
+    size: "Large (8'x10')",
+    inStock: true,
   },
   {
     id: 4,
@@ -158,6 +194,10 @@ const bestSellers = [
     rating: 4,
     reviews: 19,
     image: "GRqFxw9WIAAzYW__xpyql1", // Cloudinary public ID
+    category: ["Minimalist", "Bohemian"],
+    material: "Jute",
+    size: "Medium (5'x7')",
+    inStock: true,
   },
 ];
 
