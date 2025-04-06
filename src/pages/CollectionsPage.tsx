@@ -1,3 +1,4 @@
+
 import { Product } from "@/types/cart";
 import FilterableProductGrid from "@/components/FilterableProdcutGrid";
 import { AdvancedImage } from "@cloudinary/react";
@@ -8,17 +9,7 @@ const CollectionsPage = () => {
     <div className="container mx-auto px-6 md:px-12 py-12">
       <h1 className="text-3xl md:text-4xl font-display font-medium mb-8">Our Collections</h1>
       
-      <FilterableProductGrid
-        products={products.map((product) => ({
-          ...product,
-          image: (
-            <AdvancedImage
-              cldImg={cloudinary.image(product.image)} // Use Cloudinary public ID
-              className="w-full h-full object-cover"
-            />
-          ),
-        }))}
-      />
+      <FilterableProductGrid products={products} />
     </div>
   );
 };

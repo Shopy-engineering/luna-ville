@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useMemo } from "react";
 import { Star, ChevronDown, SlidersHorizontal, X, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -37,7 +38,7 @@ interface FilterableProductGridProps {
 /**
  * FilterableProductGrid component that displays products with filtering options
  */
-const FilterableProductGrid = ({ products }: { products: Product[] }) => {
+const FilterableProductGrid = ({ products }: FilterableProductGridProps) => {
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState([0, 1000]);
   const [sortOption, setSortOption] = useState("featured");
@@ -60,6 +61,60 @@ const FilterableProductGrid = ({ products }: { products: Product[] }) => {
     setActiveFilters([]);
     setPriceRange([0, 1000]);
   };
+
+  /**
+   * Filter and sort products based on active filters
+   */
+  const filteredProducts = useMemo(() => {
+    // First filter by active filters (category, material, size)
+    let result = products.filter(product => {
+      // Check if price is within range
+      if (product.price < priceRange[0] || product.price > priceRange[1]) {
+        return false;
+      }
+
+      // If no active filters, include all products
+      if (activeFilters.length === 0) {
+        return true;
+      }
+
+      // Check if product matches any of the active filters
+      for (const filter of activeFilters) {
+        // Check if filter is a category
+        if (product.category && product.category.includes(filter)) {
+          return true;
+        }
+        
+        // Check if filter is a material
+        if (product.material === filter) {
+          return true;
+        }
+        
+        // Check if filter is a size
+        if (product.size === filter) {
+          return true;
+        }
+      }
+      
+      return false;
+    });
+
+    // Then sort the filtered products
+    return result.sort((a, b) => {
+      switch (sortOption) {
+        case "price-asc":
+          return a.price - b.price;
+        case "price-desc":
+          return b.price - a.price;
+        case "newest":
+          // Assuming higher ID means newer product for this demo
+          return b.id - a.id;
+        default: // "featured"
+          // For featured, we could sort by rating, then by number of reviews
+          return (b.rating * 100 + b.reviews) - (a.rating * 100 + a.reviews);
+      }
+    });
+  }, [products, activeFilters, priceRange, sortOption]);
 
   return (
     <div className="flex flex-col md:flex-row gap-6">
@@ -299,7 +354,7 @@ const FilterableProductGrid = ({ products }: { products: Product[] }) => {
         {/* Desktop Sort */}
         <div className="hidden md:flex items-center justify-between mb-6">
           <div>
-            <p className="text-sm text-gray-500">Showing {products.length} products</p>
+            <p className="text-sm text-gray-500">Showing {filteredProducts.length} products</p>
           </div>
           <Select value={sortOption} onValueChange={setSortOption}>
             <SelectTrigger className="w-36">
@@ -339,15 +394,22 @@ const FilterableProductGrid = ({ products }: { products: Product[] }) => {
 
         {/* Products */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {products.map((product) => (
-            <div key={product.id} className="group">
-              <div className="relative rounded-lg overflow-hidden mb-4 aspect-square">
-                {product.image} {/* Render the AdvancedImage component */}
-              </div>
-              <h3 className="text-base font-medium">{product.name}</h3>
-              <p className="text-lunaville-700 font-medium">${product.price}</p>
+          {filteredProducts.length > 0 ? (
+            filteredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))
+          ) : (
+            <div className="col-span-full text-center py-12">
+              <p className="text-gray-500">No products match the selected filters</p>
+              <Button 
+                variant="link" 
+                onClick={clearAllFilters} 
+                className="text-luna-ville-600 mt-2"
+              >
+                Clear all filters
+              </Button>
             </div>
-          ))}
+          )}
         </div>
       </div>
     </div>
